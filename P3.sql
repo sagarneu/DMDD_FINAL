@@ -115,3 +115,91 @@ END;
 /
 
 
+CREATE TABLE USERS (
+    user_id INT PRIMARY KEY,
+    first_name VARCHAR(30) NOT NULL,
+    last_name VARCHAR(30) NOT NULL,
+    username VARCHAR(30) NOT NULL UNIQUE,
+    email_id VARCHAR(255) NOT NULL UNIQUE,
+    mobile VARCHAR(15) NOT NULL UNIQUE,
+    campus_location VARCHAR(30) NOT NULL,
+    password RAW(100) NOT NULL,
+    is_organizer number(1) NOT NULL,    
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE GROUPS (
+    group_id INT PRIMARY KEY,
+    group_name VARCHAR(30) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE USER_GROUPS (
+    user_group_id INT PRIMARY KEY,
+    user_id INT NOT NULL REFERENCES users,
+    group_id INT NOT NULL REFERENCES groups
+);
+
+CREATE TABLE TAGS (
+    tag_id INT PRIMARY KEY,
+    tag_name VARCHAR(30) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE EVENT_TAGS (
+    event_tag_id INT PRIMARY KEY,
+    tag_id INT NOT NULL REFERENCES users,
+    event_id INT NOT NULL REFERENCES groups
+);
+
+CREATE TABLE COUNTRY (
+    country_id INT PRIMARY KEY,
+    country_name VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE STATE (
+    state_id INT PRIMARY KEY,
+    state_name VARCHAR(30) NOT NULL,
+    country_id INT NOT NULL REFERENCES country
+);
+
+CREATE TABLE CITY (
+    city_id INT PRIMARY KEY,
+    city_name VARCHAR(30) NOT NULL,
+    state_id INT NOT NULL REFERENCES state
+);
+
+CREATE TABLE LOCATION (
+    location_id INT PRIMARY KEY,
+    address_line_1 VARCHAR(255) NOT NULL,
+    address_line_2 VARCHAR(255),
+    city_id INT NOT NULL REFERENCES city
+);
+
+CREATE TABLE EVENTS (
+    event_id INT PRIMARY KEY,
+    event_name VARCHAR(30) NOT NULL,
+    event_date TIMESTAMP,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    registration_fee int,
+    used_id INT NOT NULL REFERENCES users,
+    location_id INT NOT NULL REFERENCES location
+);
+
+CREATE TABLE REGISTRATIONS (
+    registration_id INT PRIMARY KEY,
+    event_id INT NOT NULL REFERENCES events,
+    user_id INT NOT NULL REFERENCES users,
+    registration_status number(1) NOT NULL,
+    payment_status number(1) NOT NULL
+);
+
+CREATE TABLE PAYMENTS (
+    payment_id INT PRIMARY KEY,
+    payment_status number(1) NOT NULL,
+    registration_id INT NOT NULL REFERENCES registrations,
+    user_id INT NOT NULL REFERENCES users,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+

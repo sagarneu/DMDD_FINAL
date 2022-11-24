@@ -1111,3 +1111,55 @@ VALUES (
     );
 select * from payments;
 
+
+
+------------------Views----------------------
+
+----------Upcoming Month events--------------------
+create or replace view upcoming_events as 
+select * from events where EXTRACT(
+    MONTH    
+    FROM
+        event_date
+    ) = 12;
+
+select * from upcoming_events;
+
+---------------Payments_made_by_users-------------------------
+create or replace view payments_and_users as
+select u.user_id, u.first_name, u.last_name, p.payment_id from users u join payments p on p.user_id = u.user_id; 
+
+select * from payments_and_users;
+
+
+----------------Users and their groups----------------------
+create or replace view users_and_groups as
+select u.user_id, u.first_name, u.last_name, g.group_name from users u, user_groups ug, groups g 
+where u.user_id = ug.user_id and ug.group_id = g.group_id;
+
+select * from users_and_groups;
+
+
+---------------Users and registrations--------------------
+create or replace view users_and_registrations as
+select u.user_id, u.first_name, u.last_name, e.event_name, e.event_date, e.registration_fee from users u, registrations r, events e
+where u.user_id = r.user_id and e.event_id = r.event_id;
+
+select * from users_and_registrations;
+
+
+---------------
+
+
+DROP SEQUENCE user_id_seq;
+DROP SEQUENCE group_id_seq;
+DROP SEQUENCE user_group_id_seq;
+DROP SEQUENCE event_id_seq;
+DROP SEQUENCE tag_id_seq;
+DROP SEQUENCE event_tag_id_seq;
+DROP SEQUENCE location_id_seq;
+DROP SEQUENCE city_id_seq;
+DROP SEQUENCE state_id_seq;
+DROP SEQUENCE country_id_seq;
+DROP SEQUENCE payment_id_seq;
+DROP SEQUENCE registration_id_seq;

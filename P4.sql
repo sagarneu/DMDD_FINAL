@@ -1,3 +1,26 @@
+SET SERVEROUTPUT on;
+
+-------------CREATE USERS---------------------------------------------------------------
+DECLARE nUser number;
+BEGIN 
+SELECT 
+  count(*) into nUser 
+FROM 
+  ALL_USERS 
+where 
+  USERNAME = 'MAST112';
+IF(nUser > 0) THEN dbms_output.put_line('USER ALREADY EXISTS');
+ELSE EXECUTE IMMEDIATE 'CREATE USER MAST112 IDENTIFIED BY "Admin_123_property_mgnt"';
+END IF;
+EXCEPTION WHEN OTHERS THEN dbms_output.put_line(
+  dbms_utility.format_error_backtrace
+);
+dbms_output.put_line(SQLERRM);ROLLBACK;
+RAISE;
+COMMIT;
+END;
+/ 
+
 
 -------------------TABLES------------------------------
 SET SERVEROUTPUT on;

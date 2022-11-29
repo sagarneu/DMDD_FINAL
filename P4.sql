@@ -1286,3 +1286,38 @@ END;
 
 
 
+---------Packages--------------------------
+
+CREATE OR REPLACE PACKAGE BODY personnel AS
+  FUNCTION get_fullname(nuser_id NUMBER) RETURN VARCHAR2 IS
+      v_fullname VARCHAR2(46);
+  BEGIN
+    SELECT first_name || ',' ||  last_name
+    INTO v_fullname
+    FROM users
+    WHERE user_id = nuser_id;
+
+    RETURN v_fullname;
+
+  EXCEPTION
+  WHEN NO_DATA_FOUND THEN
+    RETURN NULL;
+  WHEN TOO_MANY_ROWS THEN
+    RETURN NULL;
+  END;
+
+END personnel;
+
+
+DECLARE
+  nuser_id NUMBER := &user_id;
+BEGIN
+
+  v_name   := personnel.get_fullname(1);
+
+  IF v_name  IS NOT NULL
+  THEN
+    dbms_output.put_line('Name: ' || v_name);
+  END IF;
+END;
+

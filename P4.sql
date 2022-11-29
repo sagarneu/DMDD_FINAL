@@ -1321,3 +1321,35 @@ BEGIN
   END IF;
 END;
 
+
+---------Functions-------------------------
+
+create or replace FUNCTION get_total_organizers
+RETURN NUMBER
+IS
+        no_of_organizers NUMBER;
+        BEGIN
+        SELECT COUNT(is_organizer)
+        INTO no_of_organizers
+        FROM users
+        WHERE is_organizer = 1;
+
+        RETURN no_of_organizers;
+
+    EXCEPTION WHEN OTHERS THEN
+    DBMS_OUTPUT.PUT_LINE(SQLCODE);
+    DBMS_OUTPUT.PUT_LINE('DATA NOT IN TABLE');
+
+END;
+/
+SET SERVEROUTPUT ON 
+DECLARE
+P_UNRES NUMBER;
+BEGIN
+P_UNRES := get_total_organizers;
+DBMS_OUTPUT.PUT_LINE ('Total number of organizers: ' || P_UNRES );
+END;
+/
+
+
+

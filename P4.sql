@@ -1180,3 +1180,109 @@ select * from users_and_registrations;
 
 ----------------------------------------------------------------------------------------------------------------------------------------
 
+---------------INDEXES--------------------------------
+
+DECLARE COUNT_INDEXES NUMBER;
+BEGIN
+   SELECT COUNT ( * )
+     INTO COUNT_INDEXES
+     FROM USER_INDEXES
+    WHERE INDEX_NAME = 'INDEX_EVENTS';
+    
+   IF COUNT_INDEXES > 0
+   THEN
+      EXECUTE IMMEDIATE 'DROP INDEX index_events';
+      ELSE EXECUTE IMMEDIATE 'create index index_events on events(
+            event_id,
+            event_name,
+            event_date,
+            created_at,
+            registration_fee,
+            used_id,
+            location_id
+        )';
+   END IF;
+END;
+/
+
+DECLARE COUNT_INDEXES_USERS NUMBER;
+BEGIN
+   SELECT COUNT ( * )
+     INTO COUNT_INDEXES_USERS
+     FROM USER_INDEXES
+    WHERE INDEX_NAME = 'INDEX_USERS';
+    
+   IF COUNT_INDEXES_USERS > 0
+   THEN
+      EXECUTE IMMEDIATE 'DROP INDEX index_users';
+      ELSE EXECUTE IMMEDIATE 'create index index_users on users (
+            user_id,
+            first_name,
+            last_name,
+            username,
+            mobile
+        )';
+   END IF;
+END;
+/
+
+
+DECLARE COUNT_INDEXES_LOCATION NUMBER;
+BEGIN
+   SELECT COUNT ( * )
+     INTO COUNT_INDEXES_LOCATION
+     FROM USER_INDEXES
+    WHERE INDEX_NAME = 'INDEX_LOCATION';
+    
+   IF COUNT_INDEXES_LOCATION > 0
+   THEN
+      EXECUTE IMMEDIATE 'DROP INDEX index_location';
+      ELSE EXECUTE IMMEDIATE 'create index index_location on location (
+            location_id,
+            address_line_1,
+            address_line_2
+        )';
+   END IF;
+END;
+/
+
+
+DECLARE COUNT_INDEXES_GROUPS NUMBER;
+BEGIN
+   SELECT COUNT ( * )
+     INTO COUNT_INDEXES_GROUPS
+     FROM USER_INDEXES
+    WHERE INDEX_NAME = 'INDEX_GROUPS';
+    
+   IF COUNT_INDEXES_GROUPS > 0
+   THEN
+      EXECUTE IMMEDIATE 'DROP INDEX index_groups';
+      ELSE EXECUTE IMMEDIATE 'create index index_groups on groups (
+            group_id,
+            group_name
+        )';
+   END IF;
+END;
+/
+SET SERVEROUTPUT ON 
+DECLARE COUNT_INDEXES_TAGS NUMBER;
+BEGIN
+   SELECT COUNT ( * )
+     INTO COUNT_INDEXES_TAGS
+     FROM USER_INDEXES
+    WHERE INDEX_NAME = 'INDEX_TAGS';
+    
+   IF COUNT_INDEXES_TAGS > 0
+   THEN
+      EXECUTE IMMEDIATE 'DROP INDEX index_tags';
+      ELSE EXECUTE IMMEDIATE 'create index index_tags on tags (
+            tag_id,
+            tag_name
+        )';
+
+   END IF;
+END;
+/
+
+
+

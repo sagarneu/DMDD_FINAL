@@ -1353,3 +1353,17 @@ END;
 
 
 
+--------Triggers----------------------------------------------------------------
+
+create or replace trigger check_username
+before insert on users for each row  
+declare
+rowcount int;
+begin
+select count(*) into rowcount from users where username = :NEW.username;
+if rowcount<>0 then
+   raise_application_error(-20001, 'username already registered');
+end if;
+end;
+
+----------------To check if there are multiple registrations for the same event

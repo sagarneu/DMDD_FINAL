@@ -1,3 +1,4 @@
+
 SET SERVEROUTPUT on;
 
 -------------CREATE USERS---------------------------------------------------------------
@@ -11,6 +12,30 @@ where
   USERNAME = 'MAST112';
 IF(nUser > 0) THEN dbms_output.put_line('USER ALREADY EXISTS');
 ELSE EXECUTE IMMEDIATE 'CREATE USER MAST112 IDENTIFIED BY "Admin_123_event_mgnt"';
+EXECUTE IMMEDIATE 'GRANT CREATE USER, DROP USER, EXECUTE ANY TYPE, EXECUTE ANY PROCEDURE, ALTER ANY PROCEDURE, CREATE ANY TABLE, UNLIMITED TABLESPACE, DROP ANY TRIGGER, CREATE ANY PROCEDURE, ALTER ANY INDEX, CREATE ANY INDEX, CREATE TABLE, CREATE SESSION, DROP ANY TYPE, CREATE ANY TRIGGER, CREATE SEQUENCE, DROP ANY INDEX, SELECT ANY TABLE, DROP ANY TABLE, CREATE ANY TYPE, ALTER ANY TRIGGER, ALTER ANY SEQUENCE, CREATE ANY SEQUENCE,
+UPDATE ANY TABLE, CREATE TRIGGER, DROP ANY PROCEDURE, DROP ANY SEQUENCE, CREATE ANY VIEW, DELETE ANY TABLE, INSERT ANY TABLE, ALTER ANY TABLE, READ ANY TABLE, DEBUG CONNECT SESSION, MERGE ANY VIEW, ALTER ANY TYPE, CREATE PROCEDURE, SELECT ANY SEQUENCE, DROP ANY VIEW, CREATE VIEW to MAST112;';
+END IF;
+EXCEPTION WHEN OTHERS THEN dbms_output.put_line(
+  dbms_utility.format_error_backtrace
+);
+dbms_output.put_line(SQLERRM);ROLLBACK;
+RAISE;
+COMMIT;
+END;
+/ 
+
+DECLARE n2User number;
+BEGIN 
+SELECT 
+  count(*) into n2User 
+FROM 
+  ALL_USERS 
+where 
+  USERNAME = 'ORG112';
+IF(n2User > 0) THEN dbms_output.put_line('USER ALREADY EXISTS');
+ELSE EXECUTE IMMEDIATE 'CREATE USER ORG112 IDENTIFIED BY "Organizer_112_event_mgnt"';
+EXECUTE IMMEDIATE 'GRANT CREATE SESSION TO ORG112;';
+EXECUTE IMMEDIATE 'grant select, Insert, update, Delete on USERS to ORG112;';
 END IF;
 EXCEPTION WHEN OTHERS THEN dbms_output.put_line(
   dbms_utility.format_error_backtrace
@@ -90,7 +115,7 @@ BEGIN
     
     select count(*)
     INTO  seq_count from user_sequences
-    WHERE  sequence_name = 'user_id_seq';
+    WHERE  sequence_name = 'USER_ID_SEQ';
     
     IF(user_table_count > 0) THEN DBMS_OUTPUT.PUT_LINE('TABLE USERS ALREADY EXISTS'); 
     EXECUTE IMMEDIATE 'DROP TABLE USERS CASCADE CONSTRAINT';
@@ -232,6 +257,7 @@ CREATE TABLE PAYMENTS (
     user_id INT NOT NULL REFERENCES users,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
 
 CREATE SEQUENCE user_id_seq
 ORDER;
@@ -1162,7 +1188,7 @@ select u.user_id, u.first_name, u.last_name, p.payment_id from users u join paym
 
 select * from payments_and_users;
 
-
+    
 ----------------Users and their groups----------------------
 create or replace view users_and_groups as
 select u.user_id, u.first_name, u.last_name, g.group_name from users u, user_groups ug, groups g 
@@ -1288,40 +1314,97 @@ END;
 
 ---------Packages--------------------------
 
-CREATE OR REPLACE PACKAGE BODY personnel AS
-  FUNCTION get_fullname(nuser_id NUMBER) RETURN VARCHAR2 IS
-      v_fullname VARCHAR2(46);
-  BEGIN
-    SELECT first_name || ',' ||  last_name
-    INTO v_fullname
-    FROM users
-    WHERE user_id = nuser_id;
+-- CREATE OR REPLACE PACKAGE BODY personnel AS
+--   FUNCTION get_fullname(nuser_id NUMBER) RETURN VARCHAR2 IS
+--       v_fullname VARCHAR2(46);
+--   BEGIN
+--     SELECT first_name || ',' ||  last_name
+--     INTO v_fullname
+--     FROM users
+--     WHERE user_id = nuser_id;
 
-    RETURN v_fullname;
+--     RETURN v_fullname;
 
-  EXCEPTION
-  WHEN NO_DATA_FOUND THEN
-    RETURN NULL;
-  WHEN TOO_MANY_ROWS THEN
-    RETURN NULL;
-  END;
+--   EXCEPTION
+--   WHEN NO_DATA_FOUND THEN
+--     RETURN NULL;
+--   WHEN TOO_MANY_ROWS THEN
+--     RETURN NULL;
+--   END;
 
-END personnel;
-
-
-DECLARE
-  nuser_id NUMBER := &user_id;
-BEGIN
-
-  v_name   := personnel.get_fullname(1);
-
-  IF v_name  IS NOT NULL
-  THEN
-    dbms_output.put_line('Name: ' || v_name);
-  END IF;
-END;
+-- END personnel;
 
 
+-- DECLARE
+--   nuser_id NUMBER := &user_id;
+-- BEGIN
+
+--   v_name   := personnel.get_fullname(1);
+
+--   IF v_name  IS NOT NULL
+--   THEN
+--     dbms_output.put_line('Name: ' || v_name);
+--   END IF;
+-- END;
+
+-- create or replace PACKAGE MANAGE_EVENTS IS
+-- PROCEDURE ADD_EVENTS(
+--                     event_id NUMBER,
+--                     event_name VARCHAR2,
+--                     event_date DATE,
+--                     registration_fee NUMBER,
+--                     user_id NUMBER,
+--                     location_id NUMBER
+--                     );
+-- END MANAGE_EVENTS;
+-- /
+
+-- create or replace PROCEDURE ADD_EVENTS (
+--                     in_event_id NUMBER,
+--                     in_event_name VARCHAR2,
+--                     in_event_date DATE,
+--                     in_registration_fee NUMBER,
+--                     in_user_id NUMBER,
+--                     in_location_id NUMBER
+--                     )
+-- IS
+--  INVALID_INPUTS EXCEPTION;
+-- BEGIN
+--     IF (in_event_name IS NULL
+--         OR in_event_id IS NULL
+--         OR in_user_id IS NULL
+--         OR in_registration_fee IS NULL
+--         OR in_event_date IS NULL
+--         OR in_location_id IS NULL )
+--     THEN
+--      RAISE INVALID_INPUTS;
+--     END IF;
+
+-- INSERT INTO EVENTS (
+--              event_id,
+--              event_name,
+--              event_date,
+--              registration_fee,
+--              used_id,
+--              location_id
+--             ) VALUES (
+--              in_event_id,
+--              in_event_name,
+--              in_event_date,
+--              in_registration_fee,
+--              in_used_id,
+--              in_location_id
+--             );
+-- EXCEPTION
+-- WHEN INVALID_INPUTS
+-- THEN
+--  --RAISE INVALID_INPUTS;
+--  raise_application_error (-20091,'VALUES CANNOT BE NULL');
+-- --THEN DBMS_OUTPUT.PUT_LINE ('INPUTS ARE NOT VALID');
+-- -- END;
+-- END ADD_EVENTS;
+
+-- EXEC ADD_EVENTS(25,"mastatt",'30/DEC/2022',100, 3, 1);
 ---------Functions-------------------------
 
 create or replace FUNCTION get_total_organizers
@@ -1365,7 +1448,7 @@ if rowcount<>0 then
    raise_application_error(-20001, 'username already registered');
 end if;
 end;
-
+/
 ----------------To check if there are multiple registrations for the same event
 SET SERVEROUTPUT ON 
 create or replace trigger check_user_registrations
@@ -1378,7 +1461,7 @@ if rowcount<>0 then
    raise_application_error(-20001, 'User already registered');
 end if;
 end;
-
+/
 -----------To check if there are multiple payments done to the same event by the same user
 
 create or replace trigger check_user_payments
@@ -1391,3 +1474,4 @@ if rowcount<>0 then
    raise_application_error(-20001, 'Multiple payments are shown');
 end if;
 end;
+/

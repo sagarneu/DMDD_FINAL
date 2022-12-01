@@ -1379,3 +1379,15 @@ if rowcount<>0 then
 end if;
 end;
 
+-----------To check if there are multiple payments done to the same event by the same user
+
+create or replace trigger check_user_payments
+before insert on payments for each row  
+declare
+rowcount int;
+begin
+select count(*) into rowcount from payments where user_id = :NEW.user_id and registration_id = :NEW.registration_id;
+if rowcount<>0 then
+   raise_application_error(-20001, 'Multiple payments are shown');
+end if;
+end;

@@ -1367,3 +1367,15 @@ end if;
 end;
 
 ----------------To check if there are multiple registrations for the same event
+SET SERVEROUTPUT ON 
+create or replace trigger check_user_registrations
+before insert on registrations for each row  
+declare
+rowcount int;
+begin
+select count(*) into rowcount from registrations where user_id = :NEW.user_id;
+if rowcount<>0 then
+   raise_application_error(-20001, 'User already registered');
+end if;
+end;
+
